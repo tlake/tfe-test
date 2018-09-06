@@ -401,7 +401,7 @@ resource "null_resource" "provision-and-run" {
 
     inline = [
       "sudo yum update -y",
-      "sudo yum install golang",
+      "sudo yum install -y golang",
       "git clone https://github.com/tlake/tfe-test.git",
       "cd tfe-test/src/",
       "go build .",
