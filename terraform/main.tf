@@ -1,4 +1,4 @@
-variable "aws_secret_key" {
+variable "aws_access_key" {
   type = "string"
 }
 
@@ -310,13 +310,13 @@ resource "aws_security_group" "svc-sg" {
 # ELB
 ################################
 
-resource "aws_elb" "lb" {
+resource "aws_elb" "elb" {
   name    = "${var.vpc_name}"
   subnets = ["${aws_subnet.public.id}"]
 
   security_groups = [
     "${aws_security_group.vpc-sg.id}",
-    "${aws_security_group.tfe-sg.id}",
+    "${aws_security_group.svc-sg.id}",
   ]
 
   listener = {
@@ -349,7 +349,7 @@ resource "aws_elb" "lb" {
     unhealthy_threshold = 2
   }
 
-  instances = ["${aws_instance.tfe-instance.id}"]
+  instances = ["${aws_instance.svc-instance.id}"]
 
   tags = {
     Name = "${var.vpc_name}"
@@ -369,7 +369,7 @@ resource "aws_instance" "svc-instance" {
 
   security_groups = [
     "${aws_security_group.vpc-sg.id}",
-    "${aws_security_group.tfe-sg.id}",
+    "${aws_security_group.svc-sg.id}",
   ]
 
   tags = {
