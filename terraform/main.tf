@@ -26,6 +26,14 @@ variable "ssh_key_contents" {
   type = "string"
 }
 
+variable "deployment_environment" {
+  type = "string"
+}
+
+variable "service_port" {
+  type = "string"
+}
+
 output "elb_dns_name" {
   value = "${aws_elb.elb.dns_name}"
 }
@@ -404,7 +412,10 @@ resource "null_resource" "provision-and-run" {
       "sudo yum install -y golang",
       "git clone https://github.com/tlake/tfe-test.git",
       "cd tfe-test/src/",
+      "git checkout ${var.deployment_environment}",
       "go build .",
+      "export DEPLOYMENT_ENVIRONMENT=${var.deployment_environment}",
+      "export SERVICE_PORT=${var.service_port}",
       "nohup ./src &",
     ]
   }
