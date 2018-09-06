@@ -381,14 +381,14 @@ resource "null_resource" "provision-and-run" {
   depends_on = ["aws_instance.svc-instance"]
 
   triggers = {
-    tfe_instance_ids = "${join(",", aws_instance.svc-instance.*.id)}"
+    svc_instance_ids = "${join(",", aws_instance.svc-instance.*.id)}"
   }
 
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      host        = "${aws_elb.lb.dns_name}"
+      host        = "${aws_elb.elb.dns_name}"
       private_key = "${var.ssh_key_contents}"
     }
 
