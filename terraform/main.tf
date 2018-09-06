@@ -416,8 +416,8 @@ resource "null_resource" "provision-and-run" {
       "cd tfe-test",
       "git checkout ${var.deployment_environment}",
       "cd src",
-      "go build .",
-      "nohup ./src &",
+      "go build -o helloworld .",
+      "nohup ./helloworld &",
     ]
   }
 }
