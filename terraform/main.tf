@@ -410,12 +410,13 @@ resource "null_resource" "provision-and-run" {
     inline = [
       "sudo yum update -y",
       "sudo yum install -y golang",
-      "git clone https://github.com/tlake/tfe-test.git",
-      "cd tfe-test/src/",
-      "git checkout ${var.deployment_environment}",
-      "go build .",
       "export DEPLOYMENT_ENVIRONMENT=${var.deployment_environment}",
       "export SERVICE_PORT=${var.service_port}",
+      "git clone https://github.com/tlake/tfe-test.git",
+      "cd tfe-test",
+      "git checkout ${var.deployment_environment}",
+      "cd src",
+      "go build .",
       "nohup ./src &",
     ]
   }
