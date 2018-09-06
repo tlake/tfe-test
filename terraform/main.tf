@@ -261,7 +261,7 @@ resource "aws_flow_log" "vpc_flow_log" {
 resource "aws_security_group" "vpc-sg" {
   name        = "${var.vpc_name}-vpc-sg"
   vpc_id      = "${aws_vpc.vpc.id}"
-  description = "TFE VPC security group"
+  description = "VPC security group"
 
   ingress = {
     self        = true
@@ -342,8 +342,8 @@ resource "aws_elb" "elb" {
   }
 
   listener = {
-    instance_port      = 80
-    instance_protocol  = "http"
+    instance_port      = 443
+    instance_protocol  = "https"
     lb_port            = 443
     lb_protocol        = "https"
     ssl_certificate_id = "${data.aws_acm_certificate.neworca.arn}"
