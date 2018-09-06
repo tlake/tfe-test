@@ -419,6 +419,8 @@ resource "null_resource" "provision-and-run" {
       "cd src",
       "go build -o helloworld .",
 			"sudo /etc/init.d/helloworld start",
+			"sleep 10",
+			"sudo /etc/init.d/helloworld status",
     ]
   }
 }
