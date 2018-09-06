@@ -408,6 +408,18 @@ resource "null_resource" "provision-and-run" {
     svc_instance_ids = "${join(",", aws_instance.svc-instance.*.id)}"
   }
 
+  provisioner "file" {
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      host        = "${aws_elb.elb.dns_name}"
+      private_key = "${var.ssh_key_contents}"
+    }
+
+    content = "${data.template_file.init.rendered}"
+    destination = "/home/ec2-user/helloworld"
+  }
+
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -419,37 +431,15 @@ resource "null_resource" "provision-and-run" {
     inline = [
       "sudo yum update -y",
       "sudo yum install -y golang",
-      "sudo touch /etc/init.d/helloworld",
-      "sudo chmod +x /etc/init.d/helloworld",
-    ]
-  }
-
-  provisioner "file" {
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      host        = "${aws_elb.elb.dns_name}"
-      private_key = "${var.ssh_key_contents}"
-    }
-
-    content = "${data.template_file.init.rendered}"
-    destination = "/etc/init.d/helloworld"
-  }
-
-  provisioner "remote-exec" {
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      host        = "${aws_elb.elb.dns_name}"
-      private_key = "${var.ssh_key_contents}"
-    }
-
-    inline = [
+      "sudo chmod +x helloworld",
+      "sudo cp helloworld /etc/init.d/helloworld",
       "git clone https://github.com/tlake/tfe-test.git",
       "cd tfe-test",
       "git checkout ${var.deployment_environment}",
       "cd src",
       "go build -o helloworld .",
+      "sudo /etc/init.d/helloworld start",
+      "sudo /etc/init.d/helloworld stop",
       "sudo service helloworld start",
     ]
   }
