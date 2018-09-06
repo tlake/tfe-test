@@ -392,6 +392,15 @@ resource "aws_instance" "svc-instance" {
   }
 }
 
+data "template_file" "init" {
+  template = "${file("${path.module}/helloworld-init.tpl")}"
+
+  vars {
+    deployment_environment = "${var.deployment_environment}"
+    service_port           = "${var.service_port}"
+  }
+}
+
 resource "null_resource" "provision-and-run" {
   depends_on = ["aws_instance.svc-instance"]
 
@@ -410,17 +419,38 @@ resource "null_resource" "provision-and-run" {
     inline = [
       "sudo yum update -y",
       "sudo yum install -y golang",
-      "export DEPLOYMENT_ENVIRONMENT=${var.deployment_environment}",
-      "export SERVICE_PORT=${var.service_port}",
+      "sudo touch /etc/init.d/helloworld",
+      "sudo chmod +x /etc/init.d/helloworld",
+    ]
+  }
+
+  provisioner "file" {
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      host        = "${aws_elb.elb.dns_name}"
+      private_key = "${var.ssh_key_contents}"
+    }
+
+    content = "${data.template_file.init.rendered}"
+    destination = "/etc/init.d/helloworld"
+  }
+
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      host        = "${aws_elb.elb.dns_name}"
+      private_key = "${var.ssh_key_contents}"
+    }
+
+    inline = [
       "git clone https://github.com/tlake/tfe-test.git",
       "cd tfe-test",
       "git checkout ${var.deployment_environment}",
-			"sudo cp helloworld-init /etc/init.d/helloworld",
       "cd src",
       "go build -o helloworld .",
-			"sudo /etc/init.d/helloworld start",
-			"sleep 10",
-			"sudo /etc/init.d/helloworld status",
+      "sudo service helloworld start",
     ]
   }
 }
