@@ -21,7 +21,7 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, world!\nThe URI you requested was '%s'\n\n", r.URL.Path)
 		fmt.Fprintf(w, "Service port: '%s'\nDeployment environment: '%s'\n\n", servicePort, deploymentEnvironment)
-		fmt.Fprintf(w, "Does a push to production trigge anything?")
+		fmt.Fprintf(w, "Some staging work")
 	})
 
 	http.ListenAndServe(":"+servicePort, nil)
