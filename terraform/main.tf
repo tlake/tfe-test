@@ -349,7 +349,7 @@ resource "aws_elb" "elb" {
   }
 
   health_check = {
-    target              = "HTTP:80/"
+    target              = "TCP:22"
     timeout             = 5
     interval            = 30
     healthy_threshold   = 2
