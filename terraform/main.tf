@@ -415,9 +415,10 @@ resource "null_resource" "provision-and-run" {
       "git clone https://github.com/tlake/tfe-test.git",
       "cd tfe-test",
       "git checkout ${var.deployment_environment}",
+			"sudo cp helloworld-init /etc/init.d/helloworld",
       "cd src",
       "go build -o helloworld .",
-      "nohup ./helloworld &",
+			"sudo /etc/init.d/helloworld start",
     ]
   }
 }
